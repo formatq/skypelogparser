@@ -1,4 +1,4 @@
-package org.formatq;
+package org.fmq;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,12 +13,17 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    static SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    static String separator = "~";
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private static SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static String columnSeparator = "~";
+    private static String rowSeparator = "\r\n";
+
+    private static String header = "ConversationId,ConversationName,AuthorId,AuthorName,HumanTime,Date,DateTime,CallTime,ContentXml";
+    private static String flag = "\"--?T::Z\",";
+
 
     public static void main(String[] args) throws IOException {
-        Path path = null;
+        Path path;
         String filepath = "";
         if (args.length == 1) {
             filepath = args[0];
@@ -38,10 +43,11 @@ public class Main {
             return;
         }
         log("Parsing started.");
-        String header = "ConversationId,ConversationName,AuthorId,AuthorName,HumanTime,Date,DateTime,CallTime,ContentXml";
-        String flag = "\"--?T::Z\",";
+        String newFile = parse(path);
+        log("Parsing completed. New file is '" + newFile + "'");
+    }
 
-        //path = Paths.get("SkypeChatHistory.csv");
+    private static String parse(Path path) throws IOException {
         byte[] bytes = Files.readAllBytes(path);
         String s = new String(bytes, StandardCharsets.UTF_8);
         int i = s.indexOf("\r\n");
@@ -61,9 +67,8 @@ public class Main {
                     temp.append(chars[j]);
                     continue;
                 }
-                String replace = temp.toString().replace("\r\n", "").replace("\r", "").replace("\n", "");
-                String withDates = addDates(replace, flag);
-                //change separator from ',' to another
+                String replace = temp.toString().replace(rowSeparator, "").replace("\r", "").replace("\n", "");
+                String withDates = addNewColumns(replace, flag);
                 String changeSeparator = changeSeparator(withDates);
                 strings.add(changeSeparator);
                 temp = new StringBuilder();
@@ -73,15 +78,14 @@ public class Main {
             }
         }
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(header.replace(",", separator)).append("\r\n");
+        stringBuilder.append(header.replace(",", columnSeparator)).append(rowSeparator);
         for (String string : strings) {
-            stringBuilder.append(string).append("\r\n");
+            stringBuilder.append(string).append(rowSeparator);
 
         }
-        String newFile = filepath.replace(".csv", " - handled.csv");
+        String newFile = path.toString().replace(".csv", " - handled.csv");
         Files.write(Paths.get(newFile), stringBuilder.toString().getBytes(), StandardOpenOption.CREATE);
-        //System.out.println(out);
-        log("Parsing completed. New file is '" + newFile + "'");
+        return newFile;
     }
 
     private static String changeSeparator(String row) {
@@ -98,7 +102,7 @@ public class Main {
                     result.append(rowChar);
                     continue;
                 }
-                result.append(separator);
+                result.append(columnSeparator);
             } else {
                 result.append(rowChar);
             }
@@ -107,11 +111,12 @@ public class Main {
     }
 
 
-    public static String addDates(String str, String flag) {
+    private static String addNewColumns(String str, String flag) {
         int i = str.indexOf(flag);
         int start = i + flag.length();
         int end = start + 13; //timespan lenght 1507215307141
 
+        // добавляем даты
         String timespanStr = str.substring(start, end);
         long timespanLong = Long.parseLong(timespanStr);
         Date date = new Date(timespanLong);
@@ -123,6 +128,7 @@ public class Main {
         String strBegin = str.substring(0, start);
         String strEnd = str.substring(end, str.length());
 
+        //добавляем время разговоров
         String min = ",";
         //<partlist type=""started"" alt="""">  <part identity=""ayu_ivanov"">    <name>Alexander Ivanov</name>    <duration>158</duration>  </part>  <part identity=""stalf84"">    <name>Котов Сергей (П)</name>    <duration>158</duration>  </part></partlist>
         Pattern pattern = Pattern.compile("(?!(<duration>))[0-9]{1,8}(?=(</duration>))");
