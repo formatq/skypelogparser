@@ -1,4 +1,4 @@
-package org.fmq.skype.skypelogparser;
+package org.fmq.skype.logparser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
