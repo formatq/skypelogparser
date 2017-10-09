@@ -1,32 +1,32 @@
-# Приложение парсит csv файл логов Skype
+# The application prepares a csv file of logs Skype for easy import in Excel
 
-В новых версиях Skype (например, 7.40.76.202) есть возможность выгрузить историю.
+The new versions of Skype (e.g. 7.40.76.202) have the opportunity to upload a story.
 
 
-Сборка
+Build
 
 `mvn clean package`
 
-Запуск
+Start
 
 `java -jar skypelogparser.jar C:\skypelog.csv`
 
-В итоге получится
+The end result file is
 
 `skypelog - handled.csv`
 
 
-**Комментарии**
+**Some comments**
 
-В новом файле убрана колонка с timespan времени, но добавлены колонки:
-* С датой.
-* С датой и временем.
-* С временем разговора в минутах.
+In the new converted file removed column 'timespan' log, but added the following columns:
+* Date (e.g. 22.11.2001).
+* Date and Time (e.g. 22.11.2001 15:55).
+* Total conversation time in minutes (e.g. <empty> or 5).  
 
-Разделителем колонок является символ `~`.
+The column splitter is the character `~`.
 
-Первая строка содержит заголовки колонок.
+The first line contains the column headers.
 
-Файл csv загружается в excel документ через мастер импорта данных.
-После импорта достаточно сделать фильтрацию  данных и удобно манипулировать срезами по дате.
+The transformed csv file can be loaded into excel document using the data import wizard.
+After importing, you can do data filtering and comfortable to manipulate the slices by date.
 

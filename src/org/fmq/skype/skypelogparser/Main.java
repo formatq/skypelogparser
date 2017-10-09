@@ -1,4 +1,4 @@
-package org.fmq;
+package org.fmq.skype.skypelogparser;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -116,7 +116,7 @@ public class Main {
         int start = i + flag.length();
         int end = start + 13; //timespan lenght 1507215307141
 
-        // добавляем даты
+        // adding dates
         String timespanStr = str.substring(start, end);
         long timespanLong = Long.parseLong(timespanStr);
         Date date = new Date(timespanLong);
@@ -128,9 +128,9 @@ public class Main {
         String strBegin = str.substring(0, start);
         String strEnd = str.substring(end, str.length());
 
-        //добавляем время разговоров
+        //adding conversation time
         String min = ",";
-        //<partlist type=""started"" alt="""">  <part identity=""ayu_ivanov"">    <name>Alexander Ivanov</name>    <duration>158</duration>  </part>  <part identity=""stalf84"">    <name>Котов Сергей (П)</name>    <duration>158</duration>  </part></partlist>
+
         Pattern pattern = Pattern.compile("(?!(<duration>))[0-9]{1,8}(?=(</duration>))");
         Matcher matcher = pattern.matcher(strEnd);
         if (matcher.find()) {
