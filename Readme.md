@@ -30,3 +30,4 @@ The first line contains the column headers.
 The transformed csv file can be loaded into excel document using the data import wizard.
 After importing, you can do data filtering and comfortable to manipulate the slices by date.
 
+
